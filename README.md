@@ -1,5 +1,7 @@
 # arcis-example-gin
 
+[![CI](https://github.com/getarcis/arcis-example-gin/actions/workflows/ci.yml/badge.svg)](https://github.com/getarcis/arcis-example-gin/actions/workflows/ci.yml)
+
 > Minimal Gin + Arcis app. One install, one middleware line, twenty-plus attack vectors blocked.
 
 ## What this is

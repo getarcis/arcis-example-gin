@@ -1,0 +1,33 @@
+name: CI
+
+# Smoke test on every push + PR. Verifies that:
+#   1. go mod download resolves (Arcis + Gin)
+#   2. go build ./... succeeds
+#   3. go vet doesn't flag anything new
+#
+# Does NOT yet boot the server + fire the attack script in CI — that
+# lives on the org backlog as a separate item.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.22", "1.23"]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+      - run: go mod download
+      - run: go build ./...
+      - run: go vet ./...
