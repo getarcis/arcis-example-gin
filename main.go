@@ -1,13 +1,17 @@
-// Minimal Gin + Arcis app. One install, one middleware line, twenty-plus
-// attack vectors blocked. Run with `go run .`, then fire `go run attack.go`
-// in another shell to see Arcis at work.
+// Minimal Gin + Arcis app. One install, one middleware line, the full
+// Arcis sanitizer pipeline (XSS, SQL, NoSQL, path, command, SSTI, XXE,
+// prototype, LDAP, XPath, header injection) + rate limiting + security
+// headers gated against your handler when Block:true. Run with
+// `go run .`, then fire `go run attack.go` in another shell to see
+// Arcis at work. See README for the full "does / does not do" table;
+// bot / CSRF / CORS / cookies / validation / error-scrub are
+// deliberate opt-ins.
 
 package main
 
 import (
 	"log"
 
-	"github.com/GagancM/arcis"
 	arcisgin "github.com/GagancM/arcis/gin"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +22,7 @@ func main() {
 	// Block:true returns 403 on detected attacks. The default is sanitize
 	// (silently strip + observe), which is safer to roll out without
 	// breaking existing clients. We use block here so the demo is visible.
-	r.Use(arcisgin.Middleware(arcis.Config{Block: true}))
+	r.Use(arcisgin.MiddlewareWithConfig(arcisgin.Config{Block: true}))
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

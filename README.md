@@ -1,15 +1,31 @@
 # arcis-example-gin
 
-> Minimal Gin + Arcis app. One install, one middleware line, twenty-plus attack vectors blocked.
+> Minimal Gin + Arcis app. One install, one middleware line, the full Arcis sanitizer pipeline gated against your handler when `Block: true`.
 
 ## What this is
 
 The smallest possible demo of Arcis on Gin. Two files:
 
-- [`main.go`](./main.go) — Gin app with `r.Use(arcisgin.Middleware(arcis.Config{Block: true}))` as the only security line.
-- [`attack.go`](./attack.go) — fires 8 attack payloads at the running server and reports which ones Arcis blocks. Build-tagged so it doesn't conflict with the server.
+- [`main.go`](./main.go): Gin app with `r.Use(arcisgin.MiddlewareWithConfig(arcisgin.Config{Block: true}))` as the only security line.
+- [`attack.go`](./attack.go): fires 8 attack payloads at the running server and reports which ones Arcis blocks. Build-tagged so it doesn't conflict with the server.
 
 Total dependencies: `github.com/GagancM/arcis` + `github.com/gin-gonic/gin`. Nothing else.
+
+## What this adapter does and does not do
+
+| Protection | `arcisgin.MiddlewareWithConfig(arcisgin.Config{Block: true})` | Where to get it |
+|---|---|---|
+| Input sanitization (XSS, SQL, NoSQL, path, command, SSTI, XXE, prototype, LDAP, XPath, header injection) | yes | built in |
+| Rate limiting (per-IP, in-memory; configurable to Redis) | yes | built in |
+| Security headers (CSP, HSTS, X-Frame-Options, etc.) | yes | built in |
+| Bot detection | no (opt-in) | `arcis.BotDetection(...)` from the core package |
+| CSRF protection | no (opt-in) | `arcis.CSRF(...)` from the core package |
+| CORS | no (opt-in) | `arcis.CORS(...)` from the core package |
+| Secure cookies | no (opt-in) | `arcis.SecureCookies(...)` from the core package |
+| URL / redirect / file-upload validation | no (opt-in) | `arcis.ValidateURL`, `arcis.ValidateRedirect`, `arcis.ValidateFile` from `arcis/validation` |
+| Error-leakage scrubbing | no (opt-in) | `arcis.ErrorHandler(...)` from the core package |
+
+The 8-payload `attack.go` exercises only what `Block: true` ships out of the box. CSRF / CORS / cookies / bot / validation / error-scrub are deliberate opt-ins because every project enables them on different paths.
 
 ## Run it
 
@@ -39,7 +55,7 @@ BLOCK  xxe      DOCTYPE ENTITY: 403 (Arcis denied, as expected)
 
 ## How it works
 
-1. `r.Use(arcisgin.Middleware(arcis.Config{Block: true}))` registers the full Arcis middleware stack: sanitization, security headers, rate limiting, and the deny path that returns 403 on attack patterns.
+1. `r.Use(arcisgin.MiddlewareWithConfig(arcisgin.Config{Block: true}))` registers the full Arcis middleware stack: sanitization, security headers, rate limiting, and the deny path that returns 403 on attack patterns.
 2. Each request flows through Arcis before reaching your route handler.
 3. Safe input passes through unchanged. Attack payloads are detected, blocked at the boundary, and never see the handler.
 
