@@ -12,7 +12,7 @@ package main
 import (
 	"log"
 
-	arcisgin "github.com/GagancM/arcis/gin"
+	arcisgin "github.com/getarcis/arcis-go/gin"
 	"github.com/gin-gonic/gin"
 )
 
