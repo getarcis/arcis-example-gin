@@ -9,7 +9,7 @@ The smallest possible demo of Arcis on Gin. Two files:
 - [`main.go`](./main.go): Gin app with `r.Use(arcisgin.MiddlewareWithConfig(arcisgin.Config{Block: true}))` as the only security line.
 - [`attack.go`](./attack.go): fires 8 attack payloads at the running server and reports which ones Arcis blocks. Build-tagged so it doesn't conflict with the server.
 
-Total dependencies: `github.com/GagancM/arcis` + `github.com/gin-gonic/gin`. Nothing else.
+Total dependencies: `github.com/getarcis/arcis-go` + `github.com/gin-gonic/gin`. Nothing else.
 
 ## What this adapter does and does not do
 
